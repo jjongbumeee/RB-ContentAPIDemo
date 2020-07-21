@@ -71,10 +71,10 @@ app.route('/periodcategory')
   });
 
 /*app.post('/post', function (req, res) {
-  // let outputArr: any[] = [];
-  // outputArr.push(req.body.category);
-  // res.send(req.body.category);
-  // res.send(outputArr);
+  let outputArr: any[] = [];
+  outputArr.push(req.body.category);
+  res.send(req.body.category);
+  res.send(outputArr);
 });*/
 
 var server = app.listen(3000, function () {
