@@ -4,11 +4,25 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import goodsData from '../data/output(goods).json';
 import periodData from '../data/output(period).json';
+import dbdata from '../data/accountdata.json';
 
 const express = require('express');
 const app = express();
 app.use(bodyParser.json());
 app.use(cors());
+
+const MongoClient = require("mongodb").MongoClient;
+const uri = "mongodb+srv://epicmobile:" + dbdata.password +
+  "@cluster0.qp0wy.mongodb.net/test?retryWrites=true&w=majority";
+const client = new MongoClient(uri, { useNewUrlParser: true });
+
+client.connect((err) => {
+  const goodsCollection = client.db("test").collection("goods");  // goods data를 저장한 collection
+  const periodCollection = client.db("test").collection("period"); // period data를 저장한 collection
+  // perform actions on the collection object
+  
+  client.close();
+});
 
 app.route('/goodscategory')
   .get(function (req, res) {
