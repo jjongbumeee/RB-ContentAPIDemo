@@ -19,64 +19,84 @@ const client = new MongoClient(uri, { useNewUrlParser: true });
 let goodsArr: any[] = [];
 let periodArr: any[] = [];
 let limit = 5; // limit 조건이 req.body에 없을 경우 default = 5
-let type = {$in:["naver", "youtube"]}; // type 조건이 req.body에 없을 경우 default = ["naver", "youtube"]
+let type = { $in: ["naver", "youtube"] }; // type 조건이 req.body에 없을 경우 default = ["naver", "youtube"]
+let perpage = 10; // 한 번에 출력되는 page 개수 default = 10
+let page = 1; // perpage되는 번호 default = 1(ex.1~10번 결과 출력)
 
 app.route('/staging').post(
-  async (req, res)=>{
-    
+  async (req, res) => {
+    client.connect(async (err) => {
       let limit: number = 5;
-      let query: any[] = [];
+      let query_req: any[] = []; // categories, tags 조건 => $or 처리 필요하므로 배열 따로 생성
       let tagArr: any[] = [];
       let cateArr: any[] = [];
-      let goodsArr: any[] =[];
+      let goodsArr: any[] = [];
+      let query: any[] = []; // query_req와 type에 대한 조건을 모두 담은 배열
+      let perpage: number = 10;
+      let page: number = 1;
+      let outputArr: any[] = [];
       console.log(req.body);
-      if(req.body.tags){
-        for(let i in req.body.tags){
+      if (req.body.tags) {
+        for (let i in req.body.tags) {
           tagArr.push(Number(req.body.tags[i]));
         }
         console.log(tagArr);
-        query.push({tags: {$in: tagArr}})
+        query_req.push({ tags: { $in: tagArr } })
       }
-      if(req.body.categories){
-        for(let i in req.body.categories){
+      if (req.body.categories) {
+        for (let i in req.body.categories) {
           cateArr.push(Number(req.body.categories[i]));
-        }       
+        }
         console.log(cateArr);
-        query.push({categories: {$in: cateArr}})
+        query_req.push({ categories: { $in: cateArr } })
       }
-      
+      console.log(query_req);
+      query.push({ $or: query_req });
+      console.log(query);
       if (req.body.limit != null) {
         limit = req.body.limit;
       }
       if (req.body.type) {
-        query.push({type: req.body.type});
+        query.push({ type: req.body.type });
       }
-      else query.push({type:{$in:["naver", "youtube"]}});
-      console.log(query);
+      else query.push({ type: { $in: ["naver", "youtube"] } });
+      
+      if (req.body.page != null) {
+        page = req.body.page;
+      }
+
       try {
-        goodsArr = await req.db.collection(config.epicDev.collectionContents).find({$and: query}).limit(limit).toArray();
-      } catch(e) {
+        const goodsCollection = await client.db("test").collection("goods"); 
+        goodsArr = await goodsCollection.find({ $and: query  }).toArray();
+        for (let i = (perpage * page - perpage) ; i < (perpage * page); i++) {
+          outputArr.push(goodsArr[i]);
+        }
+      } catch (e) {
         console.log(e);
       } finally {
         console.log(goodsArr.length);
-        res.send(goodsArr);
+        res.send(outputArr);
+        console.log(outputArr.length);
       }
-  }
-)
-app.route('/goods')
-  .get(function(req, res) {
       
+      client.close();
+    });
+  }
+);
+app.route('/goods')
+  .get(function (req, res) {
+
   })
-  .post(function(req, res) {
+  .post(function (req, res) {
     client.connect(async (err) => {
       const goodsCollection = await client.db("test").collection("goods");  // goods data를 저장한 collection
       // perform actions on the collection object
       console.log(req.body);
       let query: any;
       query = {
-        $or: 
-        [ {tags: {$in:req.body.tags}},
-          {categories:{$in:req.body.categories}}]
+        $or:
+          [{ tags: { $in: req.body.tags } },
+          { categories: { $in: req.body.categories } }]
       }
       if (req.body.limit != null) {
         limit = req.body.limit;
@@ -87,12 +107,12 @@ app.route('/goods')
 
       try {
         goodsArr = await goodsCollection.find(query).limit(limit).toArray();
-      } catch(e) {
+      } catch (e) {
         console.log(e);
       } finally {
         console.log(goodsArr);
       }
-    
+
       res.send(goodsArr);
 
       client.close();
@@ -100,17 +120,17 @@ app.route('/goods')
   });
 
 app.route('/period')
-  .get(function(req, res) {
-      
+  .get(function (req, res) {
+
   })
-  .post(function(req, res) {
+  .post(function (req, res) {
     client.connect(async (err) => {
       const periodCollection = await client.db("test").collection("period"); // period data를 저장한 collection
       // perform actions on the collection object
       console.log(req.body);
       let query: any;
       query = {
-        categories:{$in:req.body.categories}
+        categories: { $in: req.body.categories }
       }
       if (req.body.limit != null) {
         limit = req.body.limit;
@@ -121,24 +141,24 @@ app.route('/period')
 
       try {
         periodArr = await periodCollection.find(query).limit(limit).toArray();
-      } catch(e) {
+      } catch (e) {
         console.log(e);
       } finally {
         console.log(periodArr);
       }
-    
+
       res.send(periodArr);
 
       client.close();
     });
   });
 
-  var server = app.listen(3000, function () {
-    var host = server.address().address;
-    var port = server.address().port;
-    
-    console.log('Server is working : PORT - ',port);
-  });
+var server = app.listen(3000, function () {
+  var host = server.address().address;
+  var port = server.address().port;
+
+  console.log('Server is working : PORT - ', port);
+});
 
 // let goodsCategoryArr: any[] = []; 
 // let goodsTagArr: any[] = [];
@@ -146,7 +166,7 @@ app.route('/period')
 
 // app.route('/goodscategory') // 품목 카테고리에 따른 url
 //   .get(function (req, res) {
-     
+
 //   })
 //   .post(function(req, res) {
 //     let goodsCategory = [180, 202, 204, 206, 208, 210, 212, 216, 218, 220, 224, 226, 228];
@@ -186,7 +206,7 @@ app.route('/period')
 //       } finally {
 //         console.log(goodsCategoryArr);
 //       }
-    
+
 //       res.send(goodsCategoryArr);
 
 //       client.close();
@@ -195,7 +215,7 @@ app.route('/period')
 
 // app.route('/goodstag') // 품목 태그에 따른 url
 //   .get(function(req, res) {
-    
+
 //   })
 //   .post(function(req, res) {
 //     let goodsTag = [246, 248, 249, 250, 251, 253, 254];
@@ -210,7 +230,7 @@ app.route('/period')
 //         }
 //       }
 //     }
-    
+
 //     client.connect(async (err) => {
 //       const goodsCollection = await client.db("test").collection("goods");  // goods data를 저장한 collection
 //       // perform actions on the collection object
@@ -235,7 +255,7 @@ app.route('/period')
 //       } finally {
 //         console.log(goodsTagArr);
 //       }
-    
+
 //       res.send(goodsTagArr);
 
 //       client.close();
@@ -244,7 +264,7 @@ app.route('/period')
 
 // app.route('/periodcategory') // 시기 카테고리에 따른 url
 //   .get(function(req, res) {
-    
+
 //   })
 //   .post(function(req, res) {
 //     let periodCategory = [182, 184, 186, 188, 190, 192, 194, 196, 198, 200];
@@ -259,7 +279,7 @@ app.route('/period')
 //         }
 //       }
 //     }
-    
+
 //     client.connect(async (err) => {
 //       const periodCollection = await client.db("test").collection("period"); // period data를 저장한 collection
 //       // perform actions on the collection object
@@ -282,7 +302,7 @@ app.route('/period')
 //       } finally {
 //         console.log(periodCategoryArr);
 //       }
-    
+
 //       res.send(periodCategoryArr);
 
 //       client.close();
