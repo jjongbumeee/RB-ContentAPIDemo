@@ -2,8 +2,7 @@ import _ from 'lodash';
 import testJSON from '../samplejson/tag.json';
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import goodsData from '../data/output(goods).json';
-import periodData from '../data/output(period).json';
+
 import dbdata from '../data/accountdata.json';
 import { SSL_OP_NO_QUERY_MTU } from 'constants';
 
@@ -22,6 +21,48 @@ let periodArr: any[] = [];
 let limit = 5; // limit 조건이 req.body에 없을 경우 default = 5
 let type = {$in:["naver", "youtube"]}; // type 조건이 req.body에 없을 경우 default = ["naver", "youtube"]
 
+app.route('/staging').post(
+  async (req, res)=>{
+    
+      let limit: number = 5;
+      let query: any[] = [];
+      let tagArr: any[] = [];
+      let cateArr: any[] = [];
+      let goodsArr: any[] =[];
+      console.log(req.body);
+      if(req.body.tags){
+        for(let i in req.body.tags){
+          tagArr.push(Number(req.body.tags[i]));
+        }
+        console.log(tagArr);
+        query.push({tags: {$in: tagArr}})
+      }
+      if(req.body.categories){
+        for(let i in req.body.categories){
+          cateArr.push(Number(req.body.categories[i]));
+        }       
+        console.log(cateArr);
+        query.push({categories: {$in: cateArr}})
+      }
+      
+      if (req.body.limit != null) {
+        limit = req.body.limit;
+      }
+      if (req.body.type) {
+        query.push({type: req.body.type});
+      }
+      else query.push({type:{$in:["naver", "youtube"]}});
+      console.log(query);
+      try {
+        goodsArr = await req.db.collection(config.epicDev.collectionContents).find({$and: query}).limit(limit).toArray();
+      } catch(e) {
+        console.log(e);
+      } finally {
+        console.log(goodsArr.length);
+        res.send(goodsArr);
+      }
+  }
+)
 app.route('/goods')
   .get(function(req, res) {
       
