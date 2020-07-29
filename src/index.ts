@@ -5,6 +5,7 @@ import cors from 'cors';
 
 import dbdata from '../data/accountdata.json';
 import { SSL_OP_NO_QUERY_MTU } from 'constants';
+import { isNull } from 'util';
 
 const express = require('express');
 const app = express();
@@ -26,7 +27,6 @@ let page = 1; // perpage되는 번호 default = 1(ex.1~10번 결과 출력)
 app.route('/staging').post(
   async (req, res) => {
     client.connect(async (err) => {
-      let limit: number = 5;
       let query_req: any[] = []; // categories, tags 조건 => $or 처리 필요하므로 배열 따로 생성
       let tagArr: any[] = [];
       let cateArr: any[] = [];
@@ -36,6 +36,7 @@ app.route('/staging').post(
       let page: number = 1;
       let outputArr: any[] = [];
       console.log(req.body);
+      let flag: boolean = false;
       if (req.body.tags) {
         for (let i in req.body.tags) {
           tagArr.push(Number(req.body.tags[i]));
@@ -50,12 +51,8 @@ app.route('/staging').post(
         console.log(cateArr);
         query_req.push({ categories: { $in: cateArr } })
       }
-      console.log(query_req);
       query.push({ $or: query_req });
-      console.log(query);
-      if (req.body.limit != null) {
-        limit = req.body.limit;
-      }
+
       if (req.body.type) {
         query.push({ type: req.body.type });
       }
@@ -66,14 +63,20 @@ app.route('/staging').post(
       }
 
       try {
-        const goodsCollection = await client.db("test").collection("goods"); 
-        goodsArr = await goodsCollection.find({ $and: query  }).toArray();
-        for (let i = (perpage * page - perpage) ; i < (perpage * page); i++) {
-          outputArr.push(goodsArr[i]);
+        const goodsCollection = await client.db("test").collection("goods");
+        goodsArr = await goodsCollection.find({ }).toArray();
+        if (req.body) {
+          goodsArr = await goodsCollection.find({ $and: query }).toArray();
         }
+        console.log(goodsArr);
       } catch (e) {
         console.log(e);
       } finally {
+        for (let i = (perpage * page - perpage) ; i < (perpage * page); i++) {
+          if (goodsArr[i]) {
+            outputArr.push(goodsArr[i]);
+          }
+        }
         console.log(goodsArr.length);
         res.send(outputArr);
         console.log(outputArr.length);
