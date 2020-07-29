@@ -68,7 +68,6 @@ app.route('/staging').post(
         if (req.body) {
           goodsArr = await goodsCollection.find({ $and: query }).toArray();
         }
-        console.log(goodsArr);
       } catch (e) {
         console.log(e);
       } finally {
@@ -77,6 +76,7 @@ app.route('/staging').post(
             outputArr.push(goodsArr[i]);
           }
         }
+        console.log(goodsArr);
         console.log(goodsArr.length);
         res.send(outputArr);
         console.log(outputArr.length);
