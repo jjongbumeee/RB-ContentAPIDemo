@@ -2,8 +2,8 @@ import _ from 'lodash';
 import testJSON from '../samplejson/tag.json';
 import bodyParser from 'body-parser';
 import cors from 'cors';
-
-import dbdata from '../data/accountdata.json';
+import config from './config';
+//import dbdata from '../data/accountdata.json';
 import { SSL_OP_NO_QUERY_MTU } from 'constants';
 import { isNull } from 'util';
 
@@ -13,8 +13,7 @@ app.use(bodyParser.json());
 app.use(cors());
 
 const MongoClient = require("mongodb").MongoClient;
-const uri = "mongodb+srv://epicmobile:" + dbdata.password +
-  "@cluster0.qp0wy.mongodb.net/test?retryWrites=true&w=majority";
+const uri = config.epicDev.url;
 const client = new MongoClient(uri, { useNewUrlParser: true });
 
 let goodsArr: any[] = [];
