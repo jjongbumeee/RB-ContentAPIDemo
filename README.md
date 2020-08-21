@@ -8,7 +8,7 @@ gcloud app describe //현재 프로젝트 확인
 gcloud projects list    //프로젝트 리스트
 
 
-gcloud config set [PROJECT_ID]  //프로젝트 설정
+gcloud config set project [PROJECT_ID]  //프로젝트 설정
 
 ```
 # 3. 배포
