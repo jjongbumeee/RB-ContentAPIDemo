@@ -3,7 +3,7 @@
 - https://jybaek.tistory.com/648?category=696494
 # 2. gcloud 프로젝트 설정 (gcloud sdk 로그인 이후)
 ```
-gcloud app descirbe //현재 프로젝트 확인
+gcloud app describe //현재 프로젝트 확인
 
 gcloud projects list    //프로젝트 리스트
 
