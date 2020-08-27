@@ -10,12 +10,12 @@ import { cpuUsage } from 'process';
 
 const express = require('express');
 const app = express();
-app.use(bodyParser.json());
+app.use(bodyParser.json({limit: '50mb', type: 'application/json'}));
 app.use(cors());
 
 const MongoClient = require("mongodb").MongoClient;
 const uri = config.epicDev.url;
-//const uri = `mongodb+srv://epicmobile:<password>@cluster0.qp0wy.mongodb.net/RBAPIDev?retryWrites=true&w=majority`;
+// const uri = `mongodb+srv://epicmobile:<password>@cluster0.qp0wy.mongodb.net/RBAPIDev?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true });
 
 let goodsArr: any[] = [];
