@@ -28,7 +28,7 @@ let page = 1; // perpage되는 번호 default = 1(ex.1~10번 결과 출력)
 app.route('/upload/contents').post(
   async(req, res) => {
     client.connect(async (err) => {
-      const collection = await client.db("RBAPIDev").collection("RBAPIDev");
+      const collection = await client.db(config.epicDev.db).collection("RBAPI");
       await collection.insertMany(req.body);
     })
     res.send(req.body);
