@@ -15,9 +15,6 @@ if(process.env.NODE_ENV=='development'){
   configData = {
     port: parseInt(process.env.PORT, 10),
     env: process.env.NODE_ENV,
-    logs: {
-      level: process.env.LOG_LEVEL || "silly",
-    },
     epicDev: {
       url: process.env.EPICMOBILE_DEV_ATLAS_URL,
       db: process.env.EPICMOBILE_DEV_ATLAS_DATABASE,

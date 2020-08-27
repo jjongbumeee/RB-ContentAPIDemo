@@ -6,6 +6,7 @@ import config from './config';
 //import dbdata from '../data/accountdata.json';
 import { SSL_OP_NO_QUERY_MTU } from 'constants';
 import { isNull } from 'util';
+import { cpuUsage } from 'process';
 
 const express = require('express');
 const app = express();
@@ -14,6 +15,7 @@ app.use(cors());
 
 const MongoClient = require("mongodb").MongoClient;
 const uri = config.epicDev.url;
+//const uri = `mongodb+srv://epicmobile:<password>@cluster0.qp0wy.mongodb.net/RBAPIDev?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true });
 
 let goodsArr: any[] = [];
@@ -23,7 +25,18 @@ let type = { $in: ["naver", "youtube"] }; // type 조건이 req.body에 없을 �
 let perpage = 10; // 한 번에 출력되는 page 개수 default = 10
 let page = 1; // perpage되는 번호 default = 1(ex.1~10번 결과 출력)
 
+app.route('/upload/contents').post(
+  async(req, res) => {
+    client.connect(async (err) => {
+      const collection = await client.db("RBAPIDev").collection("RBAPIDev");
+      await collection.insertMany(req.body);
+    })
+    res.send(req.body);
+  }
+)
+
 app.route('/staging').post(
+  // req = JSON
   async (req, res) => {
     client.connect(async (err) => {
       let query_req: any[] = []; // categories, tags 조건 => $or 처리 필요하므로 배열 따로 생성
@@ -62,7 +75,7 @@ app.route('/staging').post(
       }
 
       try {
-        const goodsCollection = await client.db("test").collection("goods");
+        const goodsCollection = await client.db(config.epicDev.db).collection("goods");
         goodsArr = await goodsCollection.find({ }).toArray();
         if (req.body) {
           goodsArr = await goodsCollection.find({ $and: query }).toArray();
@@ -155,7 +168,7 @@ app.route('/period')
     });
   });
 
-var server = app.listen(3000, function () {
+var server = app.listen(8080, function () {
   var host = server.address().address;
   var port = server.address().port;
 
