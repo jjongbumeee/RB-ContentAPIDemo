@@ -25,8 +25,8 @@ $ yarn deploy // 빌드 파일 생성후 gcloud deploy 실행
 
 
 ```
-# ContentsDataUpdater
 ---
+# ContentsDataUpdater
 ## 프로젝트 진행상황  
 1. [/src/index.ts](https://github.com/epicmobile18/RB-ContentsDataUpdater/blob/master/src/index.ts) <img src="https://img.shields.io/badge/status-complete-green" align = "center"/>
   - typescript 코드를 이용하여 로컬의 ExportedData를 아래의 sampleoutput형태로 변경하여 출력하는 작업 
