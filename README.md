@@ -36,14 +36,15 @@ $ yarn deploy // 빌드 파일 생성후 gcloud deploy 실행
     - 아래 설명되어 있는 wsl 환경 설정 이후 프로젝트 디렉토리에서 위 명령어 실행하시면 됩니다.
     
   
-2. [/appsScript.gs](https://github.com/epicmobile18/RB-ContentsDataUpdater/blob/master/appsScript.gs) <img src="https://img.shields.io/badge/status-ready-yellow" align = "center"/>
+2. [/appsScript.gs](https://github.com/epicmobile18/RB-ContentsDataUpdater/blob/master/appsScript.gs) <img src="https://img.shields.io/badge/status-complete-green" align = "center"/>
   - Google Apps script를 이용하여 Node.js를 거치지 않고 바로 데이터를 파싱할 수 있도록 하는 작업 완료
   - `exportData`는 outputsample 형태로 출력하는 메소드
   - `exportSheetData`는 데이터를 가공하지 않고 json 형식으로 출력하는 메소드
   - 두 가지 기능 모두 `initMenu` 실행시 GSheet 메뉴에서 선택할 수 있도록 코드 작성 완료
-  - MongoDB에 insert하는 부분은 아직 구현되지 않음
-    - 해당 부분은 API 서버를 따로 두어 Post로 해결할 예정
-    - GSheet Apps Script(POST) → 별도 API 서버(preprocess) → MongoDB insert
+  - MongoDB에 insert하는 부분은 ~아직 구현되지 않음~ 구현 완료
+    - 해당 부분은 API 서버를 따로 두어 Post로 해결~할 예정~
+    - GSheet Apps Script(POST) → 별도 API 서버(Google Appengine) → MongoDB insert
+    - [RB-ContentAPIDemo Repo](https://github.com/epicmobile18/RB-ContentAPIDemo)에서 작업 완료
   - **실행 방법**
     - 해당 코드는 *"레디베이비-조사자료-콘텐츠데이터"* 파일에 연결된 스크립트 편집기에 업로드 되어있습니다. (또는 사용을 원하시는 스크립트 편집기에 복사 해주세요.)
     - 해당 문서에 접근하셔서 *도구 - 스크립트 편집기*로 접속하시면 해당 메소드들을 실행할 수 있습니다.
